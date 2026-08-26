@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="B2BCommerceDemo.API/B2BCommerceDemo.API.csproj" />
+  <Project Path="B2BCommerceDemo.Core/B2BCommerceDemo.Core.csproj" />
+  <Project Path="B2BCommerceDemo.Infrastructure/B2BCommerceDemo.Infrastructure.csproj" />
+  <Project Path="B2BCommerceDemo.Tests/B2BCommerceDemo.Tests.csproj" Id="47ee5026-67f3-436a-8335-4f2d30b4576f" />
+  <Project Path="B2BCommerceDemo.Web/B2BCommerceDemo.Web.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+</Solution>
+
