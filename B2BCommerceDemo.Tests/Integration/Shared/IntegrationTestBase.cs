@@ -8,6 +8,7 @@ using B2BCommerceDemo.Core.Models;
 using B2BCommerceDemo.Infrastructure.Data;
 using B2BCommerceDemo.Infrastructure.Events;
 using B2BCommerceDemo.Infrastructure.Imports.Helpers;
+using B2BCommerceDemo.Infrastructure.Integrations.Icecat;
 using B2BCommerceDemo.Infrastructure.Integrations.Rackbeat;
 using B2BCommerceDemo.Infrastructure.Services;
 using B2BCommerceDemo.Infrastructure.Services.Helpers;
@@ -92,6 +93,11 @@ namespace B2BCommerceDemo.Tests.Integration.Shared
             services.AddScoped<ICompanyAccessValidator, CompanyAccessValidator>();
 
             // Icecat Integration
+            services.Configure<IcecatOptions>(options =>
+            {
+                options.Enabled = true;
+            });
+
             IcecatClientMock = new Mock<IIcecatClient>();
 
             IcecatClientMock
