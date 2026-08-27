@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: b2bcommerce-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: B2BCommerceDemoDb
+      POSTGRES_USER: b2bcommerce
+      POSTGRES_PASSWORD: dev_password_change_me
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - b2bcommerce-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  b2bcommerce-postgres-data:

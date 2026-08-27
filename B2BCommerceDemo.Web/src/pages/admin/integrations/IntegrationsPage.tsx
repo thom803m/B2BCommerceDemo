@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
     AutoAwesome,
     Inventory2,
@@ -65,6 +66,20 @@ type LatestIntegrationResult =
         completedAt: string;
         data: IcecatEnrichmentResult;
     };
+
+const getApiErrorMessage = (
+    error: unknown,
+    fallback: string
+) => {
+    if (
+        axios.isAxiosError(error) &&
+        typeof error.response?.data?.detail === "string"
+    ) {
+        return error.response.data.detail;
+    }
+
+    return fallback;
+};
 
 const integrationActions:
     IntegrationAction[] = [
@@ -263,7 +278,10 @@ const IntegrationsPage = () => {
                 );
 
                 setError(
-                    "The integration action could not be completed. Please check the backend logs and try again."
+                    getApiErrorMessage(
+                        error,
+                        "The integration action could not be completed. Please try again."
+                    )
                 );
             } finally {
                 setRunningActionId(null);

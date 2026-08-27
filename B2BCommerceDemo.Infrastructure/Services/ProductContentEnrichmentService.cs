@@ -4,9 +4,11 @@ using B2BCommerceDemo.Core.Interfaces.Integrations.Icecat;
 using B2BCommerceDemo.Core.Interfaces.Services;
 using B2BCommerceDemo.Core.Models;
 using B2BCommerceDemo.Infrastructure.Data;
+using B2BCommerceDemo.Infrastructure.Integrations.Icecat;
 using B2BCommerceDemo.Infrastructure.Mappers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Net;
 using System.Text.Json;
 
@@ -17,15 +19,18 @@ namespace B2BCommerceDemo.Infrastructure.Services
         private readonly AppDbContext _context;
         private readonly IIcecatClient _icecatClient;
         private readonly ILogger<ProductContentEnrichmentService> _logger;
+        private readonly IcecatOptions _icecatOptions;
 
         public ProductContentEnrichmentService(
             AppDbContext context,
             IIcecatClient icecatClient,
-            ILogger<ProductContentEnrichmentService> logger)
+            ILogger<ProductContentEnrichmentService> logger,
+            IOptions<IcecatOptions> icecatOptions)
         {
             _context = context;
             _icecatClient = icecatClient;
             _logger = logger;
+            _icecatOptions = icecatOptions.Value;
         }
 
         public async Task<ProductDto?> EnrichProductAsync(int productId)
@@ -352,6 +357,12 @@ namespace B2BCommerceDemo.Infrastructure.Services
 
         public async Task<IcecatEnrichmentResult> EnrichMissingContentAsync(CancellationToken cancellationToken = default)
         {
+            if (!_icecatOptions.Enabled)
+            {
+                throw new InvalidOperationException(
+                    "Icecat integration is disabled in the portfolio demo.");
+            }
+
             var result = new IcecatEnrichmentResult();
 
             var products = await _context.Products

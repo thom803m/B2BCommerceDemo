@@ -12,22 +12,29 @@ namespace B2BCommerceDemo.Infrastructure.Integrations.Rackbeat
     public class RackbeatClient : IRackbeatClient
     {
         private readonly HttpClient _httpClient;
+        private readonly RackbeatOptions _options;
 
         public RackbeatClient(HttpClient httpClient, IOptions<RackbeatOptions> options)
         {
             _httpClient = httpClient;
+            _options = options.Value;
 
-            var rackbeatOptions = options.Value;
+            _httpClient.BaseAddress = new Uri(_options.BaseUrl);
 
-            _httpClient.BaseAddress = new Uri(rackbeatOptions.BaseUrl);
+            if (_options.Enabled && !string.IsNullOrWhiteSpace(_options.ApiKey))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", _options.ApiKey);
+            }
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", rackbeatOptions.ApiKey);
-
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         public async Task<Dictionary<string, string>> GetProductFieldsAsync(string productNumber, CancellationToken cancellationToken = default)
         {
+            EnsureEnabled();
+
             var encodedProductNumber = Uri.EscapeDataString(productNumber);
 
             var response = await _httpClient.GetAsync($"products/{encodedProductNumber}/fields", cancellationToken);
@@ -80,6 +87,8 @@ namespace B2BCommerceDemo.Infrastructure.Integrations.Rackbeat
 
         public async Task<decimal> GetProductPriceAsync(string productNumber, string currency, CancellationToken cancellationToken = default)
         {
+            EnsureEnabled();
+
             var encodedProductNumber = Uri.EscapeDataString(productNumber);
             var encodedCurrency = Uri.EscapeDataString(currency);
 
@@ -115,6 +124,8 @@ namespace B2BCommerceDemo.Infrastructure.Integrations.Rackbeat
 
         public async Task<List<ProductImportDto>> GetProductsForImportAsync(CancellationToken cancellationToken = default)
         {
+            EnsureEnabled();
+
             var products = new List<ProductImportDto>();
 
             var page = 1;
@@ -209,6 +220,8 @@ namespace B2BCommerceDemo.Infrastructure.Integrations.Rackbeat
         public async Task<List<PurchaseOrderImportDto>> GetExpectedDeliveriesAsync(
             CancellationToken cancellationToken = default)
         {
+            EnsureEnabled();
+
             var result = new List<PurchaseOrderImportDto>();
 
             var page = 1;
@@ -331,6 +344,8 @@ namespace B2BCommerceDemo.Infrastructure.Integrations.Rackbeat
             string orderNumber,
             CancellationToken cancellationToken = default)
         {
+            EnsureEnabled();
+
             if (string.IsNullOrWhiteSpace(orderNumber))
             {
                 throw new ArgumentException("Rackbeat order number cannot be empty.");
@@ -366,6 +381,8 @@ namespace B2BCommerceDemo.Infrastructure.Integrations.Rackbeat
 
         public async Task<string?> CreateOrderAsync(Order order, string customerNumber, CancellationToken cancellationToken = default)
         {
+            EnsureEnabled();
+
             var request = new RackbeatOrderRequest
             {
                 CustomerNumber = customerNumber,
@@ -422,6 +439,15 @@ namespace B2BCommerceDemo.Infrastructure.Integrations.Rackbeat
             Console.WriteLine($"Rackbeat book order skipped for now. Order number: {orderNumber}");
 
             return Task.CompletedTask;
+        }
+
+        private void EnsureEnabled()
+        {
+            if (!_options.Enabled)
+            {
+                throw new InvalidOperationException(
+                    "Rackbeat integration is disabled in the portfolio demo.");
+            }
         }
 
         private static DateTime? GetDate(JsonElement element, string property)

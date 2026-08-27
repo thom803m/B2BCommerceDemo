@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace B2BCommerceDemo.Core.Models
 {
     public class Product
@@ -13,8 +11,7 @@ namespace B2BCommerceDemo.Core.Models
         public int PurchasedQuantity { get; set; }
         public DateTime? ExpectedDeliveryDate { get; set; }
         public bool IsActive { get; set; }
-        [Timestamp]
-        public byte[] RowVersion { get; set; } = default!;
+        public byte[]? RowVersion { get; set; }
         public DateTime LastSynced { get; set; }
         public int? BrandId { get; set; }
         public Brand? Brand { get; set; }

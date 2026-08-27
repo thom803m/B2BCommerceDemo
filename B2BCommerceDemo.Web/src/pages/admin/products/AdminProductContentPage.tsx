@@ -1,3 +1,4 @@
+import axios from "axios";
 import { ArrowBack, AutoAwesome, Save, } from "@mui/icons-material";
 import { Alert, Box, Button, Chip, Divider, FormControlLabel, Grid, Paper, Stack, Switch, TextField, Typography, } from "@mui/material";
 import { useEffect, useState, } from "react";
@@ -23,6 +24,20 @@ const defaultFormValues:
     description: "",
     specificationsJson: "",
     contentLocked: false,
+};
+
+const getApiErrorMessage = (
+    error: unknown,
+    fallback: string
+) => {
+    if (
+        axios.isAxiosError(error) &&
+        typeof error.response?.data?.detail === "string"
+    ) {
+        return error.response.data.detail;
+    }
+
+    return fallback;
 };
 
 const formatDate = (
@@ -311,7 +326,10 @@ const AdminProductContentPage = () => {
                 setEnrichmentDialogOpen(false);
 
                 setError(
-                    "The product could not be enriched. Icecat may not contain content for this product, or Full Icecat access may be required."
+                    getApiErrorMessage(
+                        error,
+                        "The product could not be enriched. Please try again."
+                    )
                 );
             } finally {
                 setEnriching(false);

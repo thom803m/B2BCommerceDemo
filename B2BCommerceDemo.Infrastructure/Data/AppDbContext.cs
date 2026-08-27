@@ -33,24 +33,14 @@ namespace B2BCommerceDemo.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            var provider = Database.ProviderName;
-
             var product = modelBuilder.Entity<Product>();
 
-            if (provider == "Microsoft.EntityFrameworkCore.Sqlite"
-                || provider == "Microsoft.EntityFrameworkCore.InMemory")
-            {
-                product.Property(p => p.RowVersion)
-                    .ValueGeneratedNever()
-                    .IsRequired(false);
-            }
-            else
-            {
-                product.Property(p => p.RowVersion)
-                    .IsRowVersion();
-            }
-
             // Product
+            product.Property(p => p.RowVersion)
+                .IsConcurrencyToken()
+                .ValueGeneratedNever()
+                .IsRequired(false);
+
             modelBuilder.Entity<Product>()
                 .HasIndex(p => p.Sku)
                 .IsUnique();
@@ -64,15 +54,19 @@ namespace B2BCommerceDemo.Infrastructure.Data
                 .HasPrecision(18, 2);
 
             modelBuilder.Entity<Product>()
+                .Property(p => p.ExpectedDeliveryDate)
+                .HasColumnType("date");
+
+            modelBuilder.Entity<Product>()
                 .ToTable(t =>
                     t.HasCheckConstraint(
                         "CK_Product_Stock",
-                        "[AvailableStock] >= 0"));
+                        "\"AvailableStock\" >= 0"));
 
             // Image
             modelBuilder.Entity<ProductImage>()
                 .HasIndex(x => new { x.ProductId, x.IsPrimary })
-                    .HasFilter("[IsPrimary] = 1")
+                    .HasFilter("\"IsPrimary\" = TRUE")
                     .IsUnique();
 
             // Brand

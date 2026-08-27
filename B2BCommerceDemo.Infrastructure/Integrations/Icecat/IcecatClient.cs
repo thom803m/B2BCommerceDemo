@@ -23,6 +23,8 @@ namespace B2BCommerceDemo.Infrastructure.Integrations.Icecat
 
         public async Task<IcecatProductResponse?> GetProductByBrandAndSkuAsync(string? brand, string? sku)
         {
+            EnsureEnabled();
+
             if (string.IsNullOrWhiteSpace(brand) || string.IsNullOrWhiteSpace(sku))
             {
                 return null;
@@ -89,6 +91,8 @@ namespace B2BCommerceDemo.Infrastructure.Integrations.Icecat
 
         public async Task<IcecatProductResponse?> GetProductByEanAsync(string ean)
         {
+            EnsureEnabled();
+
             if (string.IsNullOrWhiteSpace(ean))
             {
                 return null;
@@ -147,6 +151,15 @@ namespace B2BCommerceDemo.Infrastructure.Integrations.Icecat
                 $"&shopname={Uri.EscapeDataString(_options.Username)}" +
                 $"&GTIN={Uri.EscapeDataString(ean.Trim())}" +
                 $"&content=generalinfo,essentialinfo,marketingtext,featuregroups,gallery,images";
+        }
+
+        private void EnsureEnabled()
+        {
+            if (!_options.Enabled)
+            {
+                throw new InvalidOperationException(
+                    "Icecat integration is disabled in the portfolio demo.");
+            }
         }
     }
 }

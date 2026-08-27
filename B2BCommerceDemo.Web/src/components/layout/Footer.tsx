@@ -31,8 +31,29 @@ const Footer = () => {
                             B2B COMMERCE DEMO
                         </Typography>
 
-                        <Typography color="grey.300">
-                            Professional B2B webshop for IT products.
+                        <Typography
+                            variant="body2"
+                            color="grey.400"
+                            sx={{ mt: 0.5 }}
+                        >
+                            Developed by{" "}
+                            <Box
+                                component="a"
+                                href="https://github.com/thom803m/B2BCommerceDemo"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                sx={{
+                                    color: "inherit",
+                                    fontWeight: 600,
+                                    textDecoration: "none",
+                                    "&:hover": {
+                                        color: "white",
+                                        textDecoration: "underline",
+                                    },
+                                }}
+                            >
+                                Thomas Borby Lancestremère
+                            </Box>
                         </Typography>
                     </Box>
 
