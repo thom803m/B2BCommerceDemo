@@ -60,3 +60,61 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+
+  release:
+    name: Build deployment artifacts
+    runs-on: ubuntu-latest
+    needs:
+      - backend
+      - frontend
+
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Publish backend
+        run: >
+          dotnet publish B2BCommerceDemo.API/B2BCommerceDemo.API.csproj
+          --configuration Release
+          --output ./artifacts/backend
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: B2BCommerceDemo.Web/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: B2BCommerceDemo.Web
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: B2BCommerceDemo.Web
+        run: npm run build
+
+      - name: Prepare frontend artifact
+        run: |
+          mkdir -p ./artifacts/frontend
+          cp -R ./B2BCommerceDemo.Web/dist/. ./artifacts/frontend/
+
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-release
+          path: ./artifacts/backend
+          retention-days: 14
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-release
+          path: ./artifacts/frontend
+          retention-days: 14
