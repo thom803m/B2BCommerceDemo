@@ -91,7 +91,7 @@ The project contains integrations for:
 
 - **Rackbeat ERP** - products, stock, customers and orders
 - **Icecat** - product descriptions, specifications and images
-- **SMTP email** - account and order-related email notifications
+- **SMTP email (MailKit)** - email verification, company registration/approval notifications and order-status emails
 
 Rackbeat and Icecat are optional integrations and are disabled by default in the portfolio configuration. They require separate credentials and configuration to use.
 
@@ -105,16 +105,21 @@ A local PostgreSQL 17 database can be started using Docker. Database migrations 
 
 See [SETUP.md](SETUP.md) for the complete local setup instructions.
 
-## Testing and CI
+## Testing and CI/CD
 
-The solution contains automated backend tests and frontend validation.
+The project uses GitHub Actions for continuous integration and deployment preparation.
 
-GitHub Actions is configured to run:
+On pushes to the repository, the CI workflow automatically runs:
 
-- Backend build
-- Backend tests
+- Backend restore and build
+- Backend automated tests
+- Frontend dependency installation
 - Frontend lint
-- Frontend build
+- Frontend production build
+
+For the `main` branch, the workflow also creates deployment-ready artifacts for the backend API and frontend application.
+
+This provides automated validation of changes before deployment and demonstrates the build/package stage of a CI/CD pipeline. Actual production deployment is intentionally not configured for this portfolio repository.
 
 From the repository root, the main checks can also be run locally:
 
