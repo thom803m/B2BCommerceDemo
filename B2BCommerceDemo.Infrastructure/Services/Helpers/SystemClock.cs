@@ -1,6 +1,6 @@
 using B2BCommerceDemo.Core.Interfaces.Services;
 
-namespace B2BCommerceDemo.Infrastructure.Services
+namespace B2BCommerceDemo.Infrastructure.Services.Helpers
 {
     public class SystemClock : IClock
     {

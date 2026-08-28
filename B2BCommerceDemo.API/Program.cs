@@ -92,6 +92,10 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 builder.Services.Configure<RackbeatOptions>(
     builder.Configuration.GetSection("Rackbeat"));
 
+// Configure Email Options
+builder.Services.Configure<EmailOptions>(
+    builder.Configuration.GetSection("Email"));
+
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 
@@ -164,6 +168,7 @@ builder.Services.AddScoped<IEventHandler<CompanyApprovedEvent>, CompanyApprovedE
 builder.Services.AddScoped<IEventHandler<CompanyRejectedEvent>, CompanyRejectedEmailHandler>();
 builder.Services.AddScoped<IEventHandler<OrderCreatedEvent>, OrderCreatedAuditHandler>();
 builder.Services.AddScoped<IEventHandler<OrderCreatedEvent>, OrderCreatedEmailHandler>();
+builder.Services.AddScoped<IEventHandler<OrderConfirmedEvent>, OrderConfirmedEmailHandler>();
 builder.Services.AddScoped<IEventHandler<OrderProcessingEvent>, OrderProcessingEmailHandler>();
 builder.Services.AddScoped<IEventHandler<OrderShippedEvent>, OrderShippedEmailHandler>();
 builder.Services.AddScoped<IEventHandler<OrderCompletedEvent>, OrderCompletedEmailHandler>();

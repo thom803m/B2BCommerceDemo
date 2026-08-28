@@ -13,7 +13,8 @@ const HomePage = lazy(
 );
 
 const LoginPage = lazy(
-    () => import(
+    () =>
+        import(
             "../pages/auth/LoginPage"
     )
 );
@@ -40,9 +41,17 @@ const ChangePasswordPage = lazy(
 );
 
 const RegisterPage = lazy(
-    () => import(
+    () =>
+        import(
             "../pages/auth/RegisterPage"
     )
+);
+
+const ConfirmEmailPage = lazy(
+    () =>
+        import(
+            "../pages/auth/ConfirmEmailPage"
+        )
 );
 
 const ProductGridPage = lazy(
@@ -59,7 +68,8 @@ const ProductDetailPage = lazy(
 );
 
 const CartPage = lazy(
-    () => import(
+    () =>
+        import(
             "../pages/cart/CartPage"
     )
 );
@@ -212,6 +222,11 @@ const AppRoutes = () => {
                         <Route
                             path="/register"
                             element={<RegisterPage />}
+                        />
+
+                        <Route
+                            path="/confirm-email"
+                            element={<ConfirmEmailPage />}
                         />
 
                         <Route

@@ -18,7 +18,9 @@ namespace B2BCommerceDemo.Infrastructure.Events.Handlers.Orders
         public async Task HandleAsync(OrderCompletedEvent @event)
         {
             if (string.IsNullOrWhiteSpace(@event.UserEmail))
+            {
                 return;
+            }
 
             var subject = $"Order #{@event.OrderId} completed";
 

@@ -7,6 +7,7 @@ namespace B2BCommerceDemo.Core.Interfaces.Services
         string BuildCompanyRejectedTemplate(string companyName);
 
         string BuildOrderCreatedTemplate( int orderId, decimal total, DateTime createdAt);
+        string BuildOrderConfirmedTemplate(int orderId);
         string BuildOrderProcessingTemplate(int orderId);
         string BuildOrderShippedTemplate(int orderId);
         string BuildOrderCompletedTemplate(int orderId);

@@ -20,8 +20,16 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
-            console.warn("AUTO LOGOUT: Token expired or invalid");
+        const isLoginRequest =
+            error.config?.url?.includes("/accounts/login");
+
+        if (
+            error.response?.status === 401 &&
+            !isLoginRequest
+        ) {
+            console.warn(
+                "AUTO LOGOUT: Token expired or invalid"
+            );
 
             localStorage.removeItem("token");
             window.location.href = "/login";

@@ -52,6 +52,18 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Invalid email or password.");
         }
 
+        var validPassword = await _userManager.CheckPasswordAsync(user, dto.Password);
+
+        if (!validPassword)
+        {
+            throw new UnauthorizedAccessException("Invalid email or password.");
+        }
+
+        if (!user.EmailConfirmed)
+        {
+            throw new UnauthorizedAccessException("Email not confirmed.");
+        }
+
         if (user.CompanyId.HasValue)
         {
             var company = await _context.Companies.FirstOrDefaultAsync(c => c.Id == user.CompanyId);
@@ -61,23 +73,28 @@ public class AuthService : IAuthService
                 throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
-            if (company.Status != CompanyStatus.Active)
+            switch (company.Status)
             {
-                throw new UnauthorizedAccessException("Company awaiting approval.");
+                case CompanyStatus.Pending:
+                    throw new UnauthorizedAccessException(
+                        "Your company registration is awaiting approval.");
+
+                case CompanyStatus.Rejected:
+                    throw new UnauthorizedAccessException(
+                        "Your company registration has been rejected. Please contact support if you need more information.");
+
+                case CompanyStatus.Suspended:
+                    throw new UnauthorizedAccessException(
+                        "Your company account is suspended. Please contact support.");
+
+                case CompanyStatus.Active:
+                    break;
+
+                default:
+                    throw new UnauthorizedAccessException(
+                        "Your company account is not available.");
             }
         }
-
-        if (!user.EmailConfirmed)
-        {
-            throw new UnauthorizedAccessException("Email not confirmed.");
-        }
-
-        var validPassword = await _userManager.CheckPasswordAsync(user, dto.Password);
-
-        if (!validPassword)
-        {
-            throw new UnauthorizedAccessException("Invalid email or password.");
-        }       
 
         var token = await _jwtService.GenerateToken(user, user.CompanyId);
 

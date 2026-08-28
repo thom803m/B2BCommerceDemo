@@ -28,6 +28,12 @@ namespace B2BCommerceDemo.Tests.Unit.Services.AuthServiceTests
                 .Setup(x => x.FindByEmailAsync(user.Email!))
                 .ReturnsAsync(user);
 
+            userManager
+                .Setup(x => x.CheckPasswordAsync(
+                    user,
+                    "Password123"))
+                .ReturnsAsync(true);
+
             var service = CreateService(
                 context,
                 userManager: userManager);
@@ -122,8 +128,7 @@ namespace B2BCommerceDemo.Tests.Unit.Services.AuthServiceTests
         {
             var context = CreateContext();
 
-            var user = CreateUser(
-                companyId: 999);
+            var user = CreateUser(companyId: 999);
 
             var userManager = CreateUserManager();
 
@@ -131,6 +136,12 @@ namespace B2BCommerceDemo.Tests.Unit.Services.AuthServiceTests
                 .Setup(x => x.FindByEmailAsync(
                     user.Email!))
                 .ReturnsAsync(user);
+
+            userManager
+                .Setup(x => x.CheckPasswordAsync(
+                    user,
+                    "Password123"))
+                .ReturnsAsync(true);
 
             var service = CreateService(
                 context,
@@ -145,7 +156,8 @@ namespace B2BCommerceDemo.Tests.Unit.Services.AuthServiceTests
                     });
 
             await act.Should()
-                .ThrowAsync<UnauthorizedAccessException>();
+                .ThrowAsync<UnauthorizedAccessException>()
+                .WithMessage("Invalid email or password.");
         }
 
         [Fact]
@@ -160,8 +172,7 @@ namespace B2BCommerceDemo.Tests.Unit.Services.AuthServiceTests
 
             await context.SaveChangesAsync();
 
-            var user = CreateUser(
-                companyId: 1);
+            var user = CreateUser(companyId: 1);
 
             var userManager = CreateUserManager();
 
@@ -169,6 +180,12 @@ namespace B2BCommerceDemo.Tests.Unit.Services.AuthServiceTests
                 .Setup(x => x.FindByEmailAsync(
                     user.Email!))
                 .ReturnsAsync(user);
+
+            userManager
+                .Setup(x => x.CheckPasswordAsync(
+                    user,
+                    "Password123"))
+                .ReturnsAsync(true);
 
             var service = CreateService(
                 context,
@@ -184,46 +201,7 @@ namespace B2BCommerceDemo.Tests.Unit.Services.AuthServiceTests
 
             await act.Should()
                 .ThrowAsync<UnauthorizedAccessException>()
-                .WithMessage("Company awaiting approval.");
-        }
-
-        [Fact]
-        public async Task LoginAsync_Should_Throw_When_Company_Is_Rejected()
-        {
-            var context = CreateContext();
-
-            context.Companies.Add(
-                CreateCompany(
-                    1,
-                    status: CompanyStatus.Rejected));
-
-            await context.SaveChangesAsync();
-
-            var user = CreateUser(
-                companyId: 1);
-
-            var userManager = CreateUserManager();
-
-            userManager
-                .Setup(x => x.FindByEmailAsync(
-                    user.Email!))
-                .ReturnsAsync(user);
-
-            var service = CreateService(
-                context,
-                userManager: userManager);
-
-            Func<Task> act = async () =>
-                await service.LoginAsync(
-                    new LoginDto
-                    {
-                        Email = user.Email!,
-                        Password = "Password123"
-                    });
-
-            await act.Should()
-                .ThrowAsync<UnauthorizedAccessException>()
-                .WithMessage("Company awaiting approval.");
+                .WithMessage("Your company registration is awaiting approval.");
         }
 
         [Fact]
@@ -231,13 +209,11 @@ namespace B2BCommerceDemo.Tests.Unit.Services.AuthServiceTests
         {
             var context = CreateContext();
 
-            context.Companies.Add(
-                CreateCompany(1));
+            context.Companies.Add(CreateCompany(1));
 
             await context.SaveChangesAsync();
 
-            var user = CreateUser(
-                companyId: 1);
+            var user = CreateUser(companyId: 1);
 
             var userManager = CreateUserManager();
 
@@ -274,13 +250,11 @@ namespace B2BCommerceDemo.Tests.Unit.Services.AuthServiceTests
         {
             var context = CreateContext();
 
-            context.Companies.Add(
-                CreateCompany(1));
+            context.Companies.Add(CreateCompany(1));
 
             await context.SaveChangesAsync();
 
-            var user = CreateUser(
-                companyId: 1);
+            var user = CreateUser(companyId: 1);
 
             var userManager = CreateUserManager();
 
@@ -310,9 +284,7 @@ namespace B2BCommerceDemo.Tests.Unit.Services.AuthServiceTests
                 });
 
             jwtService.Verify(
-                x => x.GenerateToken(
-                    user,
-                    1),
+                x => x.GenerateToken(user, 1),
                 Times.Once);
         }
 
@@ -321,8 +293,7 @@ namespace B2BCommerceDemo.Tests.Unit.Services.AuthServiceTests
         {
             var context = CreateContext();
 
-            context.Companies.Add(
-                CreateCompany(1));
+            context.Companies.Add(CreateCompany(1));
 
             await context.SaveChangesAsync();
 
@@ -361,4 +332,3 @@ namespace B2BCommerceDemo.Tests.Unit.Services.AuthServiceTests
         }
     }
 }
-

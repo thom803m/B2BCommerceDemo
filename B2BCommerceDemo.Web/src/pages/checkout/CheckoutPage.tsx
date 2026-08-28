@@ -401,7 +401,7 @@ const OrderConfirmation = ({
                             fontWeight: 800,
                         }}
                     >
-                        Order confirmed
+                        Order received
                     </Typography>
 
                     <Typography

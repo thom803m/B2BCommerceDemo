@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/sample-data/">
+    <File Path="../../../Documents/Tests/delivery-dates.csv" />
+    <File Path="../../../Documents/Tests/products.csv" />
+  </Folder>
   <Project Path="B2BCommerceDemo.API/B2BCommerceDemo.API.csproj" />
   <Project Path="B2BCommerceDemo.Core/B2BCommerceDemo.Core.csproj" />
   <Project Path="B2BCommerceDemo.Infrastructure/B2BCommerceDemo.Infrastructure.csproj" />

@@ -82,7 +82,7 @@ namespace B2BCommerceDemo.Infrastructure.Services
 
 <h1 style='color:#222;'>Thanks for your order</h1>
 
-<p>Your order has been confirmed.</p>
+<p>We have received your order.</p>
 
 <hr/>
 
@@ -92,7 +92,9 @@ namespace B2BCommerceDemo.Infrastructure.Services
 
 <hr/>
 
-<p>We’ll notify you again when your order ships.</p>
+<p>Your order is currently pending confirmation.</p>
+
+<p>We'll notify you when its status changes.</p>
 
 </div>
 
@@ -100,6 +102,26 @@ namespace B2BCommerceDemo.Infrastructure.Services
 </html>");
 
             return sb.ToString();
+        }
+
+        public string BuildOrderConfirmedTemplate(int orderId)
+        {
+            return $@"
+<html>
+<body style='font-family: Arial; background:#f4f4f4; padding:20px;'>
+
+<div style='max-width:600px; margin:auto; background:white; padding:30px; border-radius:8px;'>
+
+<h1>Order confirmed</h1>
+
+<p>Your order <strong>#{orderId}</strong> has been confirmed.</p>
+
+<p>We are now preparing your order for processing.</p>
+
+</div>
+
+</body>
+</html>";
         }
 
         public string BuildOrderProcessingTemplate(int orderId)

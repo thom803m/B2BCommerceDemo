@@ -26,7 +26,8 @@ namespace B2BCommerceDemo.Infrastructure.Events.Handlers.Companies
             await _emailService.SendAsync(
                 @event.UserEmail,
                 "Company approved",
-                html);
+                html,
+                true);
         }
     }
 }

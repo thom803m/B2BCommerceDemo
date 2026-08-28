@@ -9,7 +9,7 @@ namespace B2BCommerceDemo.Tests.Integration.Services.CompanyServiceIntegrationTe
     public class CompanyRejectIntegrationTests : IntegrationTestBase
     {
         [Fact]
-        public async Task RejectCompany_Should_Set_Status_To_Rejected()
+        public async Task RejectCompany_Should_Delete_Company()
         {
             var service = GetService<CompanyService>();
 
@@ -23,7 +23,7 @@ namespace B2BCommerceDemo.Tests.Integration.Services.CompanyServiceIntegrationTe
 
             var fromDb = await Context.Companies.FindAsync(company.Id);
 
-            fromDb!.Status.Should().Be(CompanyStatus.Rejected);
+            fromDb.Should().BeNull();
         }
     }
 }

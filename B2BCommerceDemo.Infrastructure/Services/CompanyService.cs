@@ -6,6 +6,7 @@ using B2BCommerceDemo.Core.Interfaces.Services.Validate;
 using B2BCommerceDemo.Core.Models;
 using B2BCommerceDemo.Infrastructure.Data;
 using B2BCommerceDemo.Infrastructure.Mappers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace B2BCommerceDemo.Infrastructure.Services
@@ -15,12 +16,14 @@ namespace B2BCommerceDemo.Infrastructure.Services
         private readonly AppDbContext _context;
         private readonly IEventDispatcher _eventDispatcher;
         private readonly IValidateUniqueness _validateUniqueness;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public CompanyService(AppDbContext context, IEventDispatcher eventDispatcher, IValidateUniqueness validateUniqueness)
+        public CompanyService(AppDbContext context, IEventDispatcher eventDispatcher, IValidateUniqueness validateUniqueness, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _eventDispatcher = eventDispatcher;
             _validateUniqueness = validateUniqueness;
+            _userManager = userManager;
         }
 
         public async Task<List<CompanyDto>> GetAllAsync()
@@ -159,8 +162,7 @@ namespace B2BCommerceDemo.Infrastructure.Services
                 throw new KeyNotFoundException($"Company with id {companyId} was not found.");
             }
 
-            var priceGroupExists = await _context.PriceGroups
-                .AnyAsync(pg => pg.Id == dto.PriceGroupId);
+            var priceGroupExists = await _context.PriceGroups.AnyAsync(pg => pg.Id == dto.PriceGroupId);
 
             if (!priceGroupExists)
             {
@@ -195,30 +197,49 @@ namespace B2BCommerceDemo.Infrastructure.Services
         {
             var company = await _context.Companies
                 .Include(c => c.Users)
-                .FirstOrDefaultAsync(
-                    c => c.Id == companyId &&
-                    c.Status != CompanyStatus.Suspended);
+                .Include(c => c.CompanyPrices)
+                .FirstOrDefaultAsync(c =>
+                    c.Id == companyId &&
+                    c.Status == CompanyStatus.Pending);
 
             if (company == null)
             {
-                throw new KeyNotFoundException($"Company with id {companyId} was not found.");
+                throw new KeyNotFoundException($"Pending company with id {companyId} was not found.");
             }
 
-            company.Status = CompanyStatus.Rejected;
+            var companyName = company.Name ?? "Unknown company";
+            var userEmail = company.Users
+                .Select(u => u.Email)
+                .FirstOrDefault(email => !string.IsNullOrWhiteSpace(email));
 
-            await _context.SaveChangesAsync();
-
-            var user = company.Users.FirstOrDefault();
-
-            if (user != null)
+            if (!string.IsNullOrWhiteSpace(userEmail))
             {
                 await _eventDispatcher.PublishAsync(new CompanyRejectedEvent
                 {
                     CompanyId = company.Id,
-                    CompanyName = company.Name!,
-                    UserEmail = user.Email!
+                    CompanyName = companyName,
+                    UserEmail = userEmail
                 });
             }
+
+            foreach (var user in company.Users.ToList())
+            {
+                var deleteUserResult = await _userManager.DeleteAsync(user);
+
+                if (!deleteUserResult.Succeeded)
+                {
+                    throw new InvalidOperationException(string.Join(", ", deleteUserResult.Errors.Select(e => e.Description)));
+                }
+            }
+
+            if (company.CompanyPrices.Count > 0)
+            {
+                _context.CompanyPrices.RemoveRange(company.CompanyPrices);
+            }
+
+            _context.Companies.Remove(company);
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task ReactivateAsync(int id)
@@ -230,9 +251,7 @@ namespace B2BCommerceDemo.Infrastructure.Services
 
             if (company == null)
             {
-                throw new KeyNotFoundException(
-                    $"Suspended company with id {id} was not found."
-                );
+                throw new KeyNotFoundException($"Suspended company with id {id} was not found.");
             }
 
             company.Status = CompanyStatus.Active;
@@ -252,8 +271,7 @@ namespace B2BCommerceDemo.Infrastructure.Services
                 throw new KeyNotFoundException($"Company with id {companyId} was not found.");
             }
 
-            var priceGroupExists = await _context.PriceGroups
-                .AnyAsync(pg => pg.Id == priceGroupId);
+            var priceGroupExists = await _context.PriceGroups.AnyAsync(pg => pg.Id == priceGroupId);
 
             if (!priceGroupExists)
             {

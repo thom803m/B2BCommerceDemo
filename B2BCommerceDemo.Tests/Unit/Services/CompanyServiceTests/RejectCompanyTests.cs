@@ -10,7 +10,7 @@ namespace B2BCommerceDemo.Tests.Unit.Services.CompanyServiceTests
     public class RejectCompanyTests : CompanyServiceTestBase
     {
         [Fact]
-        public async Task RejectCompanyAsync_Should_Reject_Company()
+        public async Task RejectCompanyAsync_Should_Delete_Company()
         {
             var context = CreateContext();
 
@@ -25,7 +25,7 @@ namespace B2BCommerceDemo.Tests.Unit.Services.CompanyServiceTests
 
             var company = await context.Companies.FindAsync(1);
 
-            company!.Status.Should().Be(CompanyStatus.Rejected);
+            company.Should().BeNull();
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace B2BCommerceDemo.Tests.Unit.Services.CompanyServiceTests
 
             await act.Should()
                 .ThrowAsync<KeyNotFoundException>()
-                .WithMessage("Company with id 999 was not found.");
+                .WithMessage("Pending company with id 999 was not found.");
         }
 
         [Fact]

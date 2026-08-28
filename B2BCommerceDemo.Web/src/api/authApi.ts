@@ -20,6 +20,20 @@ export type RegisterResponse = {
     message: string;
 };
 
+export type ConfirmEmailRequest = {
+    userId: string;
+    token: string;
+};
+
+export const confirmEmail = async (
+    data: ConfirmEmailRequest
+): Promise<void> => {
+    await axiosInstance.post(
+        "/accounts/confirm-email",
+        data
+    );
+};
+
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
     const response = await axiosInstance.post("/accounts/login", data);
 

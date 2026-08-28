@@ -1,6 +1,7 @@
 import axiosInstance from "../../api/axios";
 import { useState } from "react";
 import { Alert, Box, Button, Card, CardContent, Divider, Stack, TextField, Typography, } from "@mui/material";
+import { getApiErrorMessage } from "../../utils/getApiErrorMessage";
 import { Login } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -28,10 +29,13 @@ const LoginPage = () => {
 
             login(response.data.token);
             navigate("/products");
-
-        } catch {
-            setError("Invalid email or password.");
-
+        } catch (error) {
+            setError(
+                getApiErrorMessage(
+                    error,
+                    "Invalid email or password."
+                )
+            );
         } finally {
             setLoading(false);
 

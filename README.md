@@ -1,40 +1,122 @@
 # B2B Commerce Demo
 
-B2B Commerce Demo is an anonymized portfolio version of a B2B webshop developed for approved business customers. The solution presents product, price, stock and delivery information from an ERP integration and enriches product content through Icecat.
+B2B Commerce Demo is an anonymized portfolio version of a full-stack B2B e-commerce solution developed for business customers.
 
-## Solution overview
+The application covers the complete flow from company registration and approval to product browsing, company-specific pricing, checkout, order management and email notifications. It also includes administration tools, CSV import/export and optional integrations with external ERP and product-content services.
 
-- **B2BCommerceDemo.API** - ASP.NET Core Web API, authentication, authorization and HTTP endpoints.
-- **B2BCommerceDemo.Core** - domain models, DTOs, interfaces, events and shared business contracts.
-- **B2BCommerceDemo.Infrastructure** - Entity Framework Core, ASP.NET Identity, services, persistence and external integrations.
-- **B2BCommerceDemo.Tests** - unit and integration tests.
+## Tech stack
+
+### Backend
+- C# / .NET 10
+- ASP.NET Core Web API
+- Entity Framework Core
+- ASP.NET Core Identity
+- PostgreSQL
+- JWT authentication
+- xUnit
+
+### Frontend
+- React
+- TypeScript
+- Vite
+- Material UI
+- Axios
+
+### Infrastructure and tooling
+- Docker
+- Git / GitHub
+- GitHub Actions
+- Swagger / OpenAPI
+- MailKit / SMTP
+
+## Solution structure
+
+- **B2BCommerceDemo.API** - ASP.NET Core Web API, authentication, authorization, middleware and HTTP endpoints.
+- **B2BCommerceDemo.Core** - Domain models, DTOs, interfaces, events and shared business contracts.
+- **B2BCommerceDemo.Infrastructure** - Entity Framework Core, ASP.NET Identity, application services, persistence, email handling and external integrations.
+- **B2BCommerceDemo.Tests** - Unit and integration tests.
 - **B2BCommerceDemo.Web** - React, TypeScript, Vite and Material UI frontend.
 
 ## Main functionality
 
-- Company registration, approval and price-group assignment
-- JWT-based login and role-based access
-- Product catalogue with company-specific prices
-- Stock levels and expected delivery dates
-- Shopping cart, checkout and order history
-- Administration of companies, products and orders
-- ERP integration for products, stock, customers and orders
-- Icecat enrichment of descriptions, specifications and images
+### Customer and company management
+- Business customer registration
+- Email verification
+- Administrator approval of new companies
+- Company-specific price-group assignment
+- Company suspension and account management
+- JWT-based authentication and role-based authorization
+
+### Product catalogue
+- Product search and filtering
+- Company-specific pricing
+- Stock availability
+- Incoming quantities and expected delivery dates
+- Product descriptions, specifications and images
 - CSV product import and export
 
-## Documentation
+### Shopping and orders
+- Shopping cart
+- Checkout
+- Order history
+- Administrative order management
+- Order status workflow
+- Email notifications when orders are received and confirmed
 
-- [Local setup](SETUP.md)
+### Administration
+- Company approval and management
+- Product administration
+- Order administration
+- Pricing and price-group management
+- Integration management
 
-## Security
+## Sample data
 
-Sensitive development configuration must be stored in .NET User Secrets and must not be committed to Git. Production secrets should be supplied through the hosting platform's secret or environment-variable management.
+Sample CSV files are included in the repository under:
 
-The currently required local secret keys are documented in `SETUP.md`; their values are intentionally not included in this repository.
+`sample-data/`
 
-## Quick verification
+They can be used to test the application's CSV import functionality without having to create import files manually:
 
-From the repository root:
+- [Download products.csv](sample-data/products.csv) - sample product catalogue data
+- [Download delivery-dates.csv](sample-data/delivery-dates.csv) - sample incoming quantities and expected delivery dates
+
+After logging in as an administrator, open the product administration area and select **Import data**. Use the **Products** or **Delivery dates** tab depending on the file being imported.
+
+The sample data is intended for local development and portfolio demonstration purposes only.
+
+## External integrations
+
+The project contains integrations for:
+
+- **Rackbeat ERP** - products, stock, customers and orders
+- **Icecat** - product descriptions, specifications and images
+- **SMTP email** - account and order-related email notifications
+
+Rackbeat and Icecat are optional integrations and are disabled by default in the portfolio configuration. They require separate credentials and configuration to use.
+
+Icecat product enrichment can be tested with the portfolio version and can be enabled locally with an Icecat account and username.
+
+## Database
+
+The application uses **PostgreSQL** through Entity Framework Core.
+
+A local PostgreSQL 17 database can be started using Docker. Database migrations are handled through Entity Framework Core.
+
+See [SETUP.md](SETUP.md) for the complete local setup instructions.
+
+## Testing and CI
+
+The solution contains automated backend tests and frontend validation.
+
+GitHub Actions is configured to run:
+
+- Backend build
+- Backend tests
+- Frontend lint
+- Frontend build
+
+From the repository root, the main checks can also be run locally:
 
 ```powershell
 dotnet test
@@ -45,8 +127,20 @@ npm run lint
 npm run build
 ```
 
+## Security
+
+Sensitive development configuration is stored using **.NET User Secrets** and is not committed to Git.
+
+This includes credentials and secrets for authentication, email and optional external integrations.
+
+Production secrets should be supplied through the hosting platform's secret or environment-variable management.
+
+The required local configuration keys are documented in [SETUP.md](SETUP.md), but their values are intentionally not included in this repository.
+
 ## Portfolio version
 
 This repository is an anonymized portfolio/demo version of software originally developed as part of a professional B2B e-commerce project.
 
-Company-specific branding, confidential information, production data and credentials are not included. External integrations require the developer's own configuration and credentials to run locally.
+Company-specific branding, confidential information, production credentials and other sensitive information have been removed.
+
+The portfolio version is intended to demonstrate the architecture, development process and functionality of the application rather than provide access to the original production environment.

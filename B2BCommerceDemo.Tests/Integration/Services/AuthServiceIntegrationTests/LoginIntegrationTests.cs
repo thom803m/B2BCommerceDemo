@@ -129,7 +129,7 @@ namespace B2BCommerceDemo.Tests.Integration.Services.AuthServiceIntegrationTests
 
             await act.Should()
                 .ThrowAsync<UnauthorizedAccessException>()
-                .WithMessage("Company awaiting approval.");
+                .WithMessage("Your company registration is awaiting approval.");
         }
     }
 }

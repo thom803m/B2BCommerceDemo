@@ -4,6 +4,7 @@ using B2BCommerceDemo.Core.Interfaces.Services.Validate;
 using B2BCommerceDemo.Core.Models;
 using B2BCommerceDemo.Infrastructure.Data;
 using B2BCommerceDemo.Infrastructure.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
@@ -49,15 +50,18 @@ namespace B2BCommerceDemo.Tests.Unit.Services.CompanyServiceTests.Shared
         protected static CompanyService CreateService(
             AppDbContext context,
             Mock<IValidateUniqueness>? validate = null,
-            Mock<IEventDispatcher>? eventDispatcher = null)
+            Mock<IEventDispatcher>? eventDispatcher = null,
+            Mock<UserManager<ApplicationUser>>? userManager = null)
         {
             validate ??= CreateUniquenessValidator();
             eventDispatcher ??= new Mock<IEventDispatcher>();
+            userManager ??= CreateUserManagerMock();
 
             return new CompanyService(
                 context,
                 eventDispatcher.Object,
-                validate.Object);
+                validate.Object,
+                userManager.Object);
         }
 
         protected static PriceGroup CreatePriceGroup(int id)
@@ -78,6 +82,28 @@ namespace B2BCommerceDemo.Tests.Unit.Services.CompanyServiceTests.Shared
                 PriceGroupId = priceGroupId,
                 RackbeatCustomerNumber = rackbeatCustomerNumber
             };
+        }
+
+        protected static Mock<UserManager<ApplicationUser>> CreateUserManagerMock()
+        {
+            var userStore = new Mock<IUserStore<ApplicationUser>>();
+
+            var userManager = new Mock<UserManager<ApplicationUser>>(
+                userStore.Object,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!);
+
+            userManager
+                .Setup(x => x.DeleteAsync(It.IsAny<ApplicationUser>()))
+                .ReturnsAsync(IdentityResult.Success);
+
+            return userManager;
         }
     }
 }
